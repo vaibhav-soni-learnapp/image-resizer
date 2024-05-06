@@ -14,7 +14,8 @@ def main():
         # Define size options here
         size_options = {
             "Match Column (540x270)": (540, 270),
-            "Multiple Choice Question (658x539)": (658, 539),
+            "MCQ (658x539)": (658, 539),
+            "Drag&Drop (268x128)": (268, 128),
             "Custom": None
         }
 
