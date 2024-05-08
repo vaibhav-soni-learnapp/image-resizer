@@ -64,12 +64,12 @@ def main():
         zip_bytes = create_zip(all_images_bytes)
 
         # Master download button to download all images together in a zip file
-        if st.button("Download All Images (Zip)"):
+        if st.button("Convert All Images (Zip)"):
             st.download_button(label='Download Zip', data=zip_bytes, file_name='images.zip', mime='application/zip')
 
         # Individual download buttons for each image
         for img_bytes, img_name in all_images_bytes:
-            if st.button(f"Download {img_name}"):
+            if st.button(f"Convert {img_name}"):
                 st.download_button(label=f'Download {img_name}', data=img_bytes, file_name=img_name, mime=f"image/{format.lower()}")
 
 def create_zip(images):
