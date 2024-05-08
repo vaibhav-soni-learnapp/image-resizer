@@ -32,6 +32,9 @@ def main():
         # Select new image format
         format = st.selectbox("Select New Format", ['JPEG', 'PNG', 'GIF', 'BMP', 'WEBP'])
 
+        # Initialize a list to store all image bytes
+        all_images_bytes = []
+
         # Loop to handle each image
         for uploaded_file in uploaded_files:
             with st.container():
@@ -48,19 +51,18 @@ def main():
                 if format == 'JPEG' and new_image.mode != 'RGB':
                     new_image = new_image.convert('RGB')
 
-                # Convert and prepare for download
+                # Convert and append image bytes to the list
                 try:
                     img_byte_arr = io.BytesIO()
                     new_image.save(img_byte_arr, format=format)
-                    download_name = f"{uploaded_file.name.split('.')[0]}_converted.{format.lower()}"
-
-                    # Create download button for each image
-                    st.download_button(label='Download Image',
-                                       data=img_byte_arr.getvalue(),
-                                       file_name=download_name,
-                                       mime=f"image/{format.lower()}")
+                    all_images_bytes.append((img_byte_arr.getvalue(), f"{uploaded_file.name.split('.')[0]}_converted.{format.lower()}"))
                 except Exception as e:
                     st.error(f"Failed to save the image: {e}")
+
+        # Master download button to download all images together
+        if st.button("Download All Images"):
+            for img_bytes, download_name in all_images_bytes:
+                st.download_button(label='Download Image', data=img_bytes, file_name=download_name, mime=f"image/{format.lower()}")
 
 if __name__ == "__main__":
     main()
