@@ -59,8 +59,8 @@ def main():
                 except Exception as e:
                     st.error(f"Failed to save the image: {e}")
 
-        # Master download button to download all images together
-        if st.button("Download All Images"):
+        # Master Convert button to convert all images together
+        if st.button("Convert All Images"):
             for img_bytes, download_name in all_images_bytes:
                 st.download_button(label='Download Image', data=img_bytes, file_name=download_name, mime=f"image/{format.lower()}")
 
