@@ -1,7 +1,8 @@
 import streamlit as st
 from PIL import Image
 import io
-
+import zipfile
+import os
 
 def main():
     st.title('Batch Image Resizer and Format Changer')
@@ -32,7 +33,7 @@ def main():
         # Select new image format
         format = st.selectbox("Select New Format", ['JPEG', 'PNG', 'GIF', 'BMP', 'WEBP'])
 
-        # Initialize a list to store all image bytes
+        # Initialize a list to store all image bytes and their names
         all_images_bytes = []
 
         # Loop to handle each image
@@ -51,18 +52,32 @@ def main():
                 if format == 'JPEG' and new_image.mode != 'RGB':
                     new_image = new_image.convert('RGB')
 
-                # Convert and append image bytes to the list
+                # Convert and append image bytes to the list along with their names
                 try:
                     img_byte_arr = io.BytesIO()
                     new_image.save(img_byte_arr, format=format)
-                    all_images_bytes.append((img_byte_arr.getvalue(), f"{uploaded_file.name.split('.')[0]}_converted.{format.lower()}"))
+                    all_images_bytes.append((img_byte_arr.getvalue(), uploaded_file.name))
                 except Exception as e:
                     st.error(f"Failed to save the image: {e}")
 
-        # Master Convert button to convert all images together
-        if st.button("Convert All Images"):
-            for img_bytes, download_name in all_images_bytes:
-                st.download_button(label='Download Image', data=img_bytes, file_name=download_name, mime=f"image/{format.lower()}")
+        # Create a zip file containing all the images
+        zip_bytes = create_zip(all_images_bytes)
+
+        # Master download button to download all images together in a zip file
+        if st.button("Download All Images (Zip)"):
+            st.download_button(label='Download Zip', data=zip_bytes, file_name='images.zip', mime='application/zip')
+
+        # Individual download buttons for each image
+        for img_bytes, img_name in all_images_bytes:
+            if st.button(f"Download {img_name}"):
+                st.download_button(label=f'Download {img_name}', data=img_bytes, file_name=img_name, mime=f"image/{format.lower()}")
+
+def create_zip(images):
+    zip_bytes = io.BytesIO()
+    with zipfile.ZipFile(zip_bytes, 'w') as zip_file:
+        for img_bytes, img_name in images:
+            zip_file.writestr(img_name, img_bytes)
+    return zip_bytes.getvalue()
 
 if __name__ == "__main__":
     main()
